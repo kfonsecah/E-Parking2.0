@@ -1,0 +1,14 @@
+{
+  "devDependencies": {
+    "@types/nodemailer": "^6.4.17",
+    "husky": "^9.1.7"
+  },
+  "scripts": {
+    "prepare": "husky install"
+  },
+  "lint-staged": {
+    "src/front-end/**/*.{js,ts,tsx}": [
+      "cd src/front-end && npx next lint --fix"
+    ]
+  }
+}

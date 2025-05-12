@@ -1,0 +1,50 @@
+@import url("https://fonts.googleapis.com/css2?family=Pacifico&display=swap");
+
+.svg-stroke-text,
+.svg-fill-text {
+  font-family: "Pacifico", cursive;
+  font-size: 300px;
+}
+
+/* Texto relleno oculto que aparece luego */
+.svg-fill-text {
+  fill: white;
+  opacity: 0;
+  animation: reveal-fill 6s ease forwards;
+  animation-delay: 1s; /* Espera un poco para empezar con el trazo */
+}
+
+/* Texto con stroke animado */
+.svg-stroke-text {
+  fill: none;
+  stroke: white;
+  stroke-width: 3px;
+  stroke-dasharray: 3000;
+  stroke-dashoffset: 3000;
+  animation: draw 2s ease forwards;
+}
+
+@keyframes draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes reveal-fill {
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes car-left-to-right {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100vw);
+  }
+}
+
+.animate-car-left-to-right {
+  animation: car-left-to-right 6s linear infinite;
+}

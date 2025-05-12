@@ -1,0 +1,17 @@
+kendall-fonseca:
+  name: Kendall Fonseca Hidalgo
+  title: Park Xpress System Team
+  image_url: /img/kfonseca.jpg
+  socials:
+    github: https://github.com/kfonsecah
+    linkedin: https://www.linkedin.com/in/kendallfonseca
+    website: mailto:kendall@example.com
+
+alejandro-leon:
+  name: Alejandro León Marín
+  title: Park Xpress System Team
+  image_url: /img/AleLeonMarin.jpg
+  socials:
+    github: https://github.com/AleLeonMarin
+    linkedin: https://www.linkedin.com/in/alejandro-le%C3%B3n-mar%C3%ADn-311846245/
+    website: https://aleleonmarin.vercel.app/

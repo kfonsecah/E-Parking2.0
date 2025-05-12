@@ -1,0 +1,4 @@
+{
+  "key": "ctrl+shift+fn+alt",
+  "command": "workbench.action.tasks.runBuildTask"
+}

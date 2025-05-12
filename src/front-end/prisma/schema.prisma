@@ -1,0 +1,213 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model ep_users {
+  users_id              Int       @id @default(autoincrement())
+  users_name            String    @db.VarChar(100)
+  users_lastname        String    @db.VarChar(100)
+  users_id_card         String    @db.VarChar(30)
+  users_email           String    @unique @db.VarChar(200)
+  users_username        String    @db.VarChar(30)
+  users_password        String    @db.VarChar(200)
+  users_version         Int       @default(1)
+  // 🔐 Control de sesión
+  session_id            String?   @db.VarChar(36) // UUID generado en login
+  session_last_activity DateTime? @db.Timestamp(6) // última actividad
+
+  roles            ep_user_roles[]      @relation("UserToRole")
+  cashier_sessions ep_cashier_session[] @relation("UserToCashierSession")
+  notes            ep_notes[]
+  ep_cashier_audit ep_cashier_audit[]
+}
+
+model ep_roles {
+  rol_id      Int    @id @default(autoincrement())
+  rol_name    String @db.VarChar(50)
+  rol_version Int    @default(1)
+
+  users ep_user_roles[] @relation("UserToRole")
+}
+
+model ep_user_roles {
+  rol_user_users_id Int
+  rol_user_rol_id   Int
+
+  user ep_users @relation("UserToRole", fields: [rol_user_users_id], references: [users_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_user_roles_users")
+  role ep_roles @relation("UserToRole", fields: [rol_user_rol_id], references: [rol_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_user_roles_roles")
+
+  @@id([rol_user_users_id, rol_user_rol_id])
+  @@map("ep_user_roles")
+}
+
+model ep_clients {
+  client_id            Int    @id @default(autoincrement())
+  client_name          String @db.VarChar(100)
+  client_lastname      String @db.VarChar(100)
+  client_id_card       String @db.VarChar(30)
+  client_email         String @db.VarChar(200)
+  client_phone         String @db.VarChar(30)
+  client_address       String @db.VarChar(200)
+  client_vehicle_plate String @db.VarChar(20)
+  client_version       Int    @default(1)
+
+  packages ep_clients_packages[]
+}
+
+model ep_packages {
+  pack_id      Int    @id @default(autoincrement())
+  pack_name    String @db.VarChar(100)
+  pack_price   Int
+  pack_version Int    @default(1)
+
+  clients ep_clients_packages[]
+}
+
+model ep_clients_packages {
+  client_pack_id         Int      @id @default(autoincrement())
+  client_pack_client_id  Int
+  client_pack_pack_id    Int
+  client_pack_start_date DateTime @db.Date
+  client_pack_end_date   DateTime @db.Date
+  status                 String   @default("pendiente")
+
+  client          ep_clients           @relation(fields: [client_pack_client_id], references: [client_id], map: "fk_clients_packages_clients")
+  package         ep_packages          @relation(fields: [client_pack_pack_id], references: [pack_id], map: "fk_clients_packages_packages")
+  reminder_emails ep_reminder_emails[]
+
+  @@map("ep_clients_packages")
+}
+
+model ep_information {
+  info_id            Int    @id @default(autoincrement())
+  info_name          String @db.VarChar(100)
+  info_owner         String @db.VarChar(100)
+  info_owner_id_card String @db.VarChar(50)
+  info_owner_phone   String @db.VarChar(100)
+  info_location      String @db.VarChar(200)
+  info_spaces        Int
+  info_image         Bytes
+  info_schedule      String @db.VarChar(200)
+  info_version       Int    @default(1)
+}
+
+model ep_cashier_session {
+  session_id           Int       @id @default(autoincrement())
+  session_user_id      Int
+  session_open_amount  Decimal   @db.Decimal(10, 2)
+  session_open_time    DateTime
+  session_close_amount Decimal?  @db.Decimal(10, 2)
+  session_close_time   DateTime?
+  session_is_closed    Boolean   @default(false)
+  session_cash_type    String    @db.VarChar(50)
+  session_version      Int       @default(1)
+
+  user             ep_users                 @relation("UserToCashierSession", fields: [session_user_id], references: [users_id])
+  transactions     ep_cashier_transaction[]
+  ep_cashier_audit ep_cashier_audit[]
+
+  @@map("ep_cashier_session")
+}
+
+model ep_cashier_transaction {
+  transaction_id          Int              @id @default(autoincrement())
+  transaction_session_id  Int
+  transaction_amount      Decimal          @db.Decimal(10, 2)
+  transaction_type        transaction_type
+  transaction_pay_method  payment_method
+  transaction_description String?          @db.VarChar(255)
+  transaction_created_at  DateTime         @default(now())
+
+  session ep_cashier_session @relation(fields: [transaction_session_id], references: [session_id])
+
+  @@map("ep_cashier_transaction")
+}
+
+model ep_cashier_audit {
+  audit_id              Int      @id @default(autoincrement())
+  audit_session_id      Int
+  audit_user_id         Int
+  audit_cash_type       String
+  audit_expected_amount Float
+  audit_real_amount     Float
+  audit_difference      Float
+  audit_reason          String
+  audit_created_at      DateTime @default(now())
+
+  // 💰 Desglose por tipo
+  audit_cash_coins    Float @default(0) // monedas
+  audit_cash_bills    Float @default(0) // billetes
+  audit_cash_sinpe    Float @default(0) // sinpe móvil
+  audit_cash_transfer Float @default(0) // transferencia
+
+  cashierSession ep_cashier_session @relation(fields: [audit_session_id], references: [session_id])
+  user           ep_users           @relation(fields: [audit_user_id], references: [users_id])
+}
+
+model ep_vehicles {
+  veh_id           Int       @id @default(autoincrement())
+  veh_reference    String    @db.VarChar(100)
+  veh_plate        String    @db.VarChar(10)
+  veh_owner        String    @db.VarChar(100)
+  veh_color        String?   @db.VarChar(30)
+  veh_ingress_date DateTime  @db.Timestamp(6)
+  veh_egress_date  DateTime? @db.Timestamp(6)
+  veh_status       String    @db.VarChar(1)
+  veh_tax          String    @db.VarChar(10)
+  veh_version      Int       @default(1)
+}
+
+model ep_notes {
+  notes_id      Int      @id @default(autoincrement())
+  notes_user_id Int
+  notes_content String
+  notes_date    DateTime @db.Timestamp(6)
+
+  user ep_users @relation(fields: [notes_user_id], references: [users_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_notes_users")
+}
+
+model ep_tax {
+  tax_id      Int @id @default(autoincrement())
+  tax_price   Int
+  tax_version Int @default(1)
+}
+
+model ep_server {
+  server_id       Int    @id @default(autoincrement())
+  server_type     String @db.VarChar(30)
+  server_port     String @db.VarChar(100)
+  server_protocol String @db.VarChar(100)
+  server_mail     String @db.VarChar(100)
+  server_password String @db.VarChar(200)
+  server_timeout  Int
+  server_version  Int    @default(1)
+}
+
+model ep_reminder_emails {
+  reminder_email_id Int      @id @default(autoincrement())
+  client_pack_id    Int
+  email_sent_at     DateTime @default(now()) @db.Timestamptz(6)
+
+  client_package ep_clients_packages @relation(fields: [client_pack_id], references: [client_pack_id], map: "fk_ep_reminder_emails_client_pack")
+
+  @@index([client_pack_id], map: "idx_ep_reminder_emails_client_pack_id")
+  @@map("ep_reminder_emails")
+}
+
+enum transaction_type {
+  ingreso
+  egreso
+}
+
+enum payment_method {
+  efectivo
+  tarjeta
+  transferencia
+  otros
+}
