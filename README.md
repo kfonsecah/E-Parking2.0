@@ -20,7 +20,6 @@ Diseñar e implementar un sistema web que optimice la gestión de parqueo, permi
 - 👥 **Gestión de usuarios** y permisos administrativos.
 - 🧠 **Detección automática de color y placa del vehículo** desde la cámara del celular.
 
-<img src="./vista5.png" alt="Ingreso de vehículos" />
 
 ## 🛠️ Tecnologías Utilizadas
 
@@ -64,7 +63,6 @@ Diseñar e implementar un sistema web que optimice la gestión de parqueo, permi
 - Número de vehículos registrados.
 - Historial de entradas y salidas con filtros por fecha.
 
-<img src="./vista5.png" alt="Generación de reportes" />
 
 ## 💳 Módulo de Caja
 
@@ -72,6 +70,8 @@ Diseñar e implementar un sistema web que optimice la gestión de parqueo, permi
 - Diferentes métodos de pago: efectivo, Sinpe Móvil, tarjeta.
 - Generación e impresión del ticket de salida.
 
+
+## 🎞️Imágenes Generales
 <br/><br/>
 <p align="center">
   <img src="design/vista6.png" alt="Vista de caja y pago" width="280" style="margin-right: 10px;" />
