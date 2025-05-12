@@ -28,9 +28,8 @@ Diseñar e implementar un sistema web que optimice la gestión de parqueo, permi
   <img src="https://raw.githubusercontent.com/github/explore/main/topics/react/react.png" alt="React" width="40" />
   <img src="https://raw.githubusercontent.com/github/explore/main/topics/nextjs/nextjs.png" alt="Next.js" width="40" />
   <img src="https://raw.githubusercontent.com/github/explore/main/topics/typescript/typescript.png" alt="TypeScript" width="40" />
-  <img src="https://raw.githubusercontent.com/github/explore/main/topics/tailwindcss/tailwindcss.png" alt="TailwindCSS" width="40" />
-  <img src="https://raw.githubusercontent.com/pmndrs/zustand/main/docs/public/logo.png)" alt="Zustand" width="40" />
-  <img src="https://seeklogo.com/images/R/react-query-logo-1340EA4CE9-seeklogo.com.png" alt="React Query" width="40" />
+  <img src="https://img.icons8.com/?size=100&id=4PiNHtUJVbLs&format=png&color=000000"alt="TailwindCSS" width="40" />
+  <img src="design/react-quey.png" alt="React Query" width="40" />
   <img src="https://avatars.githubusercontent.com/u/139895814?s=200&v=4" alt="shadcn/ui" width="40" />
 </p>
 
@@ -40,10 +39,10 @@ Diseñar e implementar un sistema web que optimice la gestión de parqueo, permi
 <p align="center">
   <img src="https://cdn-icons-png.flaticon.com/512/1006/1006771.png" alt="API REST" width="40" />
   <img src="https://raw.githubusercontent.com/github/explore/main/topics/nextjs/nextjs.png" alt="Next.js" width="40" />
-  <img src="https://raw.githubusercontent.com/prisma/docs/2a4a0d7cb223931747dbdebadb11ac426ff8105e/docs/static/img/prisma-logo.png" alt="Prisma" width="40" />
+  <img src="design/prisma-2.png" alt="Prisma" width="40" />
   <img src="https://raw.githubusercontent.com/github/explore/main/topics/postgresql/postgresql.png" alt="PostgreSQL" width="40" />
   <img src="https://jwt.io/img/pic_logo.svg" alt="JWT" width="40" />
-  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Google_%22G%22_Logo.svg/768px-Google_%22G%22_Logo.svg.png" alt="Google OAuth" width="40" />
+  <img src="design/oauth.png" alt="Google OAuth" width="40" />
 </p>
 
 
@@ -52,7 +51,7 @@ Diseñar e implementar un sistema web que optimice la gestión de parqueo, permi
   <img src="https://raw.githubusercontent.com/github/explore/main/topics/visual-studio-code/visual-studio-code.png" alt="VSCode Insider" width="40" />
   <img src="https://raw.githubusercontent.com/github/explore/main/topics/docker/docker.png" alt="Docker" width="40" />
   <img src="https://raw.githubusercontent.com/github/explore/main/topics/git/git.png" alt="Git" width="40" />
-  <img src="https://raw.githubusercontent.com/typicode/husky/main/assets/icon.svg" alt="Husky" width="40" />
+  <img src="design/husky.png" alt="Husky" width="40" />
   <img src="https://raw.githubusercontent.com/facebook/docusaurus/main/website/static/img/docusaurus.png" alt="Docusaurus" width="40" />
 </p>
 
