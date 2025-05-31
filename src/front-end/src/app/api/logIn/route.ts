@@ -6,6 +6,99 @@ import { v4 as uuidv4 } from "uuid";
 
 const prisma = new PrismaClient();
 
+/**
+ * @swagger
+ * /api/auth/login:
+ *   post:
+ *     summary: User Login
+ *     description: Authenticates a user with a username and password, returning a JWT token in a secure cookie.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               users_username:
+ *                 type: string
+ *                 description: The username of the user.
+ *                 example: "johndoe"
+ *               users_password:
+ *                 type: string
+ *                 description: The password of the user.
+ *                 example: "mypassword123"
+ *     responses:
+ *       200:
+ *         description: User successfully authenticated.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 users_name:
+ *                   type: string
+ *                   description: The first name of the authenticated user.
+ *                   example: "John"
+ *                 users_lastname:
+ *                   type: string
+ *                   description: The last name of the authenticated user.
+ *                   example: "Doe"
+ *                 users_username:
+ *                   type: string
+ *                   description: The username of the authenticated user.
+ *                   example: "johndoe"
+ *                 users_email:
+ *                   type: string
+ *                   description: The email address of the authenticated user.
+ *                   example: "john.doe@example.com"
+ *                 role:
+ *                   type: string
+ *                   description: The role of the authenticated user.
+ *                   example: "Administrator"
+ *       400:
+ *         description: Missing username or password.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Usuario y contraseña son requeridos."
+ *       401:
+ *         description: Invalid credentials.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Credenciales incorrectas."
+ *       404:
+ *         description: User not found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Usuario no registrado. Comuníquese con el administrador."
+ *       500:
+ *         description: Internal server error.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Hubo un error en el inicio de sesión."
+ *                 detail:
+ *                   type: string
+ *                   example: "An unexpected error occurred during login."
+ */
 export async function POST(req: NextRequest) {
   try {
     const {

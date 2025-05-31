@@ -5,6 +5,98 @@ import slugify from "slugify";
 
 const prisma = new PrismaClient();
 
+/**
+ * @swagger
+ * /api/clients/register:
+ *   post:
+ *     summary: Register New Client and Package
+ *     description: Registers a new client with the provided details and associates a package with the client, returning a unique client slug.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               client_name:
+ *                 type: string
+ *                 description: The first name of the client.
+ *                 example: "John"
+ *               client_lastname:
+ *                 type: string
+ *                 description: The last name of the client.
+ *                 example: "Doe"
+ *               client_id_card:
+ *                 type: string
+ *                 description: The identification card number of the client.
+ *                 example: "1234567890"
+ *               client_email:
+ *                 type: string
+ *                 description: The email address of the client.
+ *                 example: "john.doe@example.com"
+ *               client_phone:
+ *                 type: string
+ *                 description: The phone number of the client.
+ *                 example: "+50688887777"
+ *               client_address:
+ *                 type: string
+ *                 description: The physical address of the client.
+ *                 example: "123 Main St, San José, Costa Rica"
+ *               client_vehicle_plate:
+ *                 type: string
+ *                 description: The vehicle plate number of the client.
+ *                 example: "ABC123"
+ *               selectedPackage:
+ *                 type: string
+ *                 description: The ID of the package the client is subscribing to.
+ *                 example: "1"
+ *               client_pack_start_date:
+ *                 type: string
+ *                 format: date
+ *                 description: The start date of the package.
+ *                 example: "2025-05-01"
+ *               client_pack_end_date:
+ *                 type: string
+ *                 format: date
+ *                 description: The end date of the package.
+ *                 example: "2025-05-31"
+ *     responses:
+ *       200:
+ *         description: Client and package registered successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Cliente y paquete registrados correctamente."
+ *                 client_slug:
+ *                   type: string
+ *                   description: The unique slug generated for the client.
+ *                   example: "john-doe-123"
+ *       400:
+ *         description: Missing required fields.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Faltan campos obligatorios."
+ *       500:
+ *         description: Internal server error.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Error interno del servidor."
+ */
+
 // ✅ Método POST
 export async function POST(req: Request) {
   try {

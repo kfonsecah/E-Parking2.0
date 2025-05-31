@@ -3,7 +3,121 @@ import { PrismaClient } from "@prisma/client";
 import { getUserIdFromRequest } from "@/lib/getUserIdFromRequest";
 
 const prisma = new PrismaClient();
-
+/**
+ * @swagger
+ * /api/cashier/close:
+ *   post:
+ *     summary: Close Cashier Session
+ *     description: Closes an active cashier session for an authenticated user. The user must provide the actual counted amount for the session and may include an optional breakdown of the counted cash.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               realAmount:
+ *                 type: number
+ *                 description: Actual counted amount for the cashier session.
+ *                 example: 25000.00
+ *               reason:
+ *                 type: string
+ *                 description: Reason for closing the session. Optional but required if there is a discrepancy.
+ *                 example: "Discrepancy detected during cash count"
+ *               breakdown:
+ *                 type: object
+ *                 description: Detailed cash breakdown.
+ *                 properties:
+ *                   coins:
+ *                     type: number
+ *                     description: Total amount in coins.
+ *                     example: 500.00
+ *                   bills:
+ *                     type: number
+ *                     description: Total amount in bills.
+ *                     example: 23000.00
+ *                   sinpe:
+ *                     type: number
+ *                     description: Total amount received via SINPE mobile.
+ *                     example: 1000.00
+ *                   transfer:
+ *                     type: number
+ *                     description: Total amount received via bank transfers.
+ *                     example: 500.00
+ *     responses:
+ *       200:
+ *         description: Cashier session successfully closed.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Cashier session successfully closed"
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     session:
+ *                       type: object
+ *                       description: Information about the closed session.
+ *                     expectedBalance:
+ *                       type: number
+ *                       description: The calculated expected balance.
+ *                       example: 25000.00
+ *                     realBalance:
+ *                       type: number
+ *                       description: The actual counted amount registered.
+ *                       example: 24000.00
+ *                     difference:
+ *                       type: number
+ *                       description: The difference between the expected and actual amounts.
+ *                       example: -1000.00
+ *                 timestamp:
+ *                   type: string
+ *                   format: date-time
+ *                   description: Timestamp of the closure in UTC format.
+ *                   example: "2025-05-19T17:45:00Z"
+ *       400:
+ *         description: Validation error or no open session found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "No open cashier session found"
+ *                 detail:
+ *                   type: string
+ *                   example: "The requested cashier session could not be found."
+ *       401:
+ *         description: User not authenticated.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "User not authenticated"
+ *                 detail:
+ *                   type: string
+ *                   example: "The user must be authenticated to close the cashier session."
+ *       500:
+ *         description: Internal server error.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Internal server error"
+ *                 detail:
+ *                   type: string
+ *                   example: "An unexpected error occurred while closing the cashier session."
+ */
 export async function POST(req: NextRequest) {
   try {
     const userId = await getUserIdFromRequest(req);

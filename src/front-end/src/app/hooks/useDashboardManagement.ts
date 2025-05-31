@@ -9,12 +9,15 @@ interface Nota {
   id: number;
   contenido: string;
   fecha: string;
+  expiracion?: string;
+  estado: string;
+  color: string;
   usuario: string;
 }
 
 interface NotasResponse {
   ok: boolean;
-  notas?: Nota[]; // ✅ coincide con el backend
+  notas?: Nota[];
   error?: string;
 }
 
@@ -43,7 +46,7 @@ export function useDashboardManagement() {
     router,
     name,
     role,
-    notas: data?.notas ?? [], // ✅ clave correcta y con fallback
+    notas: data?.notas ?? [],
     loadingNotas: isPending,
     errorNotas: error?.message || null,
   };

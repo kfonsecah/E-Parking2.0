@@ -5,6 +5,80 @@ import { authOptions } from "@/lib/authOptions";
 
 const prisma = new PrismaClient();
 
+/**
+ * @swagger
+ * /api/dashboard:
+ *   get:
+ *     summary: Get Dashboard Data
+ *     description: Retrieves parking and cashier data for the authenticated user's dashboard, including available spaces, parked cars, and financial summaries.
+ *     responses:
+ *       200:
+ *         description: Dashboard data retrieved successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 availableSpaces:
+ *                   type: integer
+ *                   description: The number of available parking spaces.
+ *                   example: 50
+ *                 totalSpaces:
+ *                   type: integer
+ *                   description: The total number of parking spaces.
+ *                   example: 100
+ *                 egressedCars:
+ *                   type: integer
+ *                   description: The total number of cars that have exited the parking lot.
+ *                   example: 30
+ *                 onExitCars:
+ *                   type: integer
+ *                   description: The number of cars that have exited within the last 15 minutes.
+ *                   example: 5
+ *                 parkedCars:
+ *                   type: integer
+ *                   description: The total number of currently parked cars.
+ *                   example: 20
+ *                 openingAmount:
+ *                   type: number
+ *                   description: The total opening amount of active cashier sessions for the day.
+ *                   example: 10000.00
+ *                 totalIngresos:
+ *                   type: number
+ *                   description: The total amount of ingresos (cash in) for the day.
+ *                   example: 15000.00
+ *                 totalEgresos:
+ *                   type: number
+ *                   description: The total amount of egresos (cash out) for the day.
+ *                   example: 5000.00
+ *                 saldoActual:
+ *                   type: number
+ *                   description: The current balance of active cashier sessions for the day.
+ *                   example: 20000.00
+ *       401:
+ *         description: User not authenticated.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Usuario no autenticado"
+ *       500:
+ *         description: Internal server error.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Error al cargar datos del dashboard"
+ *                 detail:
+ *                   type: string
+ *                   example: "An unexpected error occurred while loading dashboard data."
+ */
 export async function GET(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
@@ -94,7 +168,7 @@ export async function GET(req: NextRequest) {
       // 📦 Datos del parqueo
       availableSpaces: (totalSpaces?.info_spaces ?? 0) - parkedCars,
       totalSpaces: totalSpaces?.info_spaces ?? 0,
-      egressedCars, 
+      egressedCars,
       onExitCars,
       parkedCars,
 

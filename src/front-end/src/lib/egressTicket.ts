@@ -1,5 +1,3 @@
-import { PDFDocument, StandardFonts } from "pdf-lib";
-
 export async function generateEgressTicket({
   owner,
   plate,
@@ -15,13 +13,14 @@ export async function generateEgressTicket({
   egressDate: string;
   fare: string;
 }) {
+  const pdfLib = await import("pdf-lib");
   const response = await fetch("/api/information");
   const info = await response.json();
-  const pdfDoc = await PDFDocument.create();
+  const pdfDoc = await pdfLib.PDFDocument.create();
   const page = pdfDoc.addPage([165, 842]); // 58x297 mm
-  const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
-  const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
-  const italicFont = await pdfDoc.embedFont(StandardFonts.HelveticaOblique);
+  const font = await pdfDoc.embedFont(pdfLib.StandardFonts.Helvetica);
+  const boldFont = await pdfDoc.embedFont(pdfLib.StandardFonts.HelveticaBold);
+  const italicFont = await pdfDoc.embedFont(pdfLib.StandardFonts.HelveticaOblique);
 
   const fontSize = 10;
   const smallFontSize = 8;

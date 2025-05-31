@@ -1,13 +1,17 @@
 import { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import { PrismaClient } from "@prisma/client";
-import { AdapterUser } from "next-auth/adapters";
 import { v4 as uuidv4 } from "uuid";
 
-declare module "next-auth/adapters" {
-  interface AdapterUser {
-    role?: string;
-    sessionId?: string;
+declare module "next-auth" {
+  interface Session {
+    user: {
+      id: number;
+      name: string;
+      email: string;
+      role: string;
+      sessionId: string;
+    };
   }
 }
 
@@ -22,7 +26,7 @@ export const authOptions: NextAuthOptions = {
   ],
 
   callbacks: {
-    async signIn({ profile, user }) {
+    async signIn({ profile, user, account }) {
       if (!profile?.email) return false;
 
       const userInDb = await prisma.ep_users.findFirst({
@@ -38,14 +42,7 @@ export const authOptions: NextAuthOptions = {
         );
       }
 
-      // ❌ Bloquear si ya hay sesión activa
-      if (userInDb.session_id) {
-        throw new Error(
-          "SessionAlreadyActive|Ya hay una sesión activa con esta cuenta."
-        );
-      }
-
-      // ✅ Crear session_id y registrar última actividad
+      // Crear nuevo `sessionId` para NextAuth
       const sessionId = uuidv4();
       const now = new Date();
 
@@ -57,22 +54,21 @@ export const authOptions: NextAuthOptions = {
         },
       });
 
-      const adapterUser = user as AdapterUser;
-      adapterUser.name = `${userInDb.users_name} ${userInDb.users_lastname}`;
-      adapterUser.email = userInDb.users_email;
-      adapterUser.role = userInDb.roles?.[0]?.role?.rol_name || "Usuario";
-      adapterUser.id = userInDb.users_id.toString();
-      adapterUser.sessionId = sessionId;
+      // Asignar datos adicionales al usuario
+      user.id = userInDb.users_id.toString();
+      user.name = `${userInDb.users_name} ${userInDb.users_lastname}`;
+      user.email = userInDb.users_email;
+      (user as any).role = userInDb.roles?.[0]?.role?.rol_name || "Usuario";
+      (user as any).sessionId = sessionId;
 
       return true;
     },
 
     async jwt({ token, user }) {
       if (user) {
-        token.name = user.name;
+        token.id = user.id;
         token.email = user.email;
         (token as any).role = (user as any).role;
-        (token as any).id = (user as any).id;
         (token as any).sessionId = (user as any).sessionId;
       }
       return token;
@@ -80,10 +76,10 @@ export const authOptions: NextAuthOptions = {
 
     async session({ session, token }) {
       if (session.user) {
+        session.user.id = token.id as number;
         session.user.name = token.name as string;
         session.user.email = token.email as string;
         (session.user as any).role = (token as any).role;
-        (session.user as any).id = (token as any).id;
         (session.user as any).sessionId = (token as any).sessionId;
       }
       return session;
@@ -92,7 +88,7 @@ export const authOptions: NextAuthOptions = {
 
   pages: {
     signIn: "/auth",
-    error: "/auth", // redirige errores personalizados
+    error: "/auth", // Redirige errores personalizados
   },
 
   secret: process.env.NEXTAUTH_SECRET,

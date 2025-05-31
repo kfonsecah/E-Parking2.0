@@ -1,4 +1,3 @@
-import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
 
 export async function generateIngressTicket({
   owner,
@@ -11,14 +10,15 @@ export async function generateIngressTicket({
   reference: string;
   ingressDate: string;
 }) {
+  const pdfLib = await import("pdf-lib");
   const response = await fetch("/api/information");
   const info = await response.json();
 
-  const pdfDoc = await PDFDocument.create();
+  const pdfDoc = await pdfLib.PDFDocument.create();
   const page = pdfDoc.addPage([165, 425]); // Tamaño: 58x150 mm
-  const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
-  const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
-  const italicFont = await pdfDoc.embedFont(StandardFonts.HelveticaOblique);
+  const font = await pdfDoc.embedFont(pdfLib.StandardFonts.Helvetica);
+  const boldFont = await pdfDoc.embedFont(pdfLib.StandardFonts.HelveticaBold);
+  const italicFont = await pdfDoc.embedFont(pdfLib.StandardFonts.HelveticaOblique);
   const fontSize = 10;
   let y = 405; // Ajustado para mejor aprovechamiento del espacio
 

@@ -260,7 +260,9 @@ create table
         notes_id int not null DEFAULT nextval ('eparking.ep_notes_seq') PRIMARY KEY,
         notes_user_id int not null,
         notes_content text not null,
-        notes_date date not null
+        notes_date date not null,
+        notes_expiry date,
+        notes_status varchar(20) not null DEFAULT "nuevo"
     );
 
 ----------------------------------------------------------------------------------------------------------------

@@ -41,8 +41,8 @@ export async function middleware(req: NextRequest) {
           return NextResponse.redirect(new URL("/auth", req.url));
         }
 
-        userId = parseInt((token as any).id);
-        sessionId = (token as any).sessionId;
+        userId = token.id as number;
+        sessionId = token.sessionId as string;
         origin = "NextAuth";
       } catch (error) {
         console.error("❌ Error verificando token de NextAuth:", error);
@@ -50,7 +50,6 @@ export async function middleware(req: NextRequest) {
       }
     }
 
-    // 🔍 Verificar que el `session_id` en la base de datos sea válido
     const user = await prisma.ep_users.findUnique({
       where: { users_id: userId },
     });
@@ -65,12 +64,6 @@ export async function middleware(req: NextRequest) {
       return NextResponse.redirect(new URL("/auth", req.url));
     }
 
-    // 🕒 Actualizar última actividad para mantener la sesión activa
-    await prisma.ep_users.update({
-      where: { users_id: userId },
-      data: { session_last_activity: new Date() },
-    });
-
     // ✅ Sesión válida
     return NextResponse.next();
   } catch (error) {
@@ -78,8 +71,3 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(new URL("/auth", req.url));
   }
 }
-
-// 🔐 Rutas protegidas
-export const config = {
-  matcher: ["/panel/:path*", "/dashboard/:path*", "/api/protected/:path*"],
-};

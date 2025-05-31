@@ -6,6 +6,66 @@ import { sendMail } from "@/lib/mailer";
 
 const prisma = new PrismaClient();
 
+/**
+ * @swagger
+ * /users/password/recovery:
+ *   post:
+ *     summary: Send Password Recovery Email
+ *     description: Sends a temporary password to the user's registered email for account recovery.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 description: The registered email of the user.
+ *                 example: "john@example.com"
+ *     responses:
+ *       200:
+ *         description: Recovery email sent successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Recovery email sent successfully."
+ *       400:
+ *         description: Missing email field.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "The email field is required."
+ *       404:
+ *         description: User not found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "No user found with this email."
+ *       500:
+ *         description: Server error.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "An error occurred while sending the email."
+ */
 export async function POST(req: NextRequest) {
   try {
     const { email } = await req.json();

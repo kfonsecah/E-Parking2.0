@@ -19,7 +19,74 @@ function normalizeCedula(value: string): string {
 }
 
 const prisma = new PrismaClient();
-
+/**
+ * @swagger
+ * /api/telegram:
+ *   post:
+ *     summary: Handle Telegram Bot Webhook
+ *     description: Processes incoming messages and callbacks from the Park Xpress Telegram bot, including authentication, note creation, and user registration.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               message:
+ *                 type: object
+ *                 description: The message object from the Telegram bot.
+ *                 example:
+ *                   message_id: 123
+ *                   from:
+ *                     id: 456
+ *                     first_name: "Juan"
+ *                     last_name: "Pérez"
+ *                   chat:
+ *                     id: 789
+ *                     type: "private"
+ *                   text: "/start"
+ *                   date: 1684497851
+ *               callback_query:
+ *                 type: object
+ *                 description: The callback query object from inline buttons.
+ *                 example:
+ *                   id: "1234567890"
+ *                   from:
+ *                     id: 456
+ *                     first_name: "Juan"
+ *                     last_name: "Pérez"
+ *                   message:
+ *                     message_id: 123
+ *                     chat:
+ *                       id: 789
+ *                       type: "private"
+ *                   data: "registrar_usuario"
+ *     responses:
+ *       200:
+ *         description: Webhook processed successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 ok:
+ *                   type: boolean
+ *                   description: Indicates if the message was processed successfully.
+ *                   example: true
+ *       500:
+ *         description: Internal server error.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 ok:
+ *                   type: boolean
+ *                   example: false
+ *                 error:
+ *                   type: string
+ *                   example: "Error interno del servidor"
+ */
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
@@ -133,44 +200,91 @@ export async function POST(req: NextRequest) {
     }
 
     // 🔘 Guardar nota
-    if (
-      (sessionState === "authenticated" || sessionState === "writing_note") &&
-      texto
-    ) {
+    if (sessionState === "authenticated" || sessionState === "writing_note") {
       const userId = userTelegramToDbId.get(chatId);
-      if (userId) {
-        const crTime = new Date(Date.now() - 6 * 60 * 60 * 1000);
-        await prisma.ep_notes.create({
-          data: {
-            notes_user_id: userId,
-            notes_content: texto,
-            notes_date: crTime,
-          },
+      if (userId && texto) {
+        // Separar estado y contenido
+        const [estado, ...resto] = texto.split(" ");
+        const contenido = resto.join(" ").trim().replace(/  +/g, " ");
+
+        // Validar estado
+        const estadosValidos = ["nuevo", "advertencia", "alerta"];
+        if (!estadosValidos.includes(estado.toLowerCase())) {
+          await sendMessage(
+            chatId,
+            "⚠️ Estado no válido. Use 'nuevo', 'advertencia' o 'alerta'."
+          );
+          return NextResponse.json({ ok: true });
+        }
+
+        // Guardar el estado provisionalmente
+        pendingUserData.set(chatId, {
+          id: userId,
+          status: estado.toLowerCase(),
+          content: contenido,
         });
 
-        await sendMessage(chatId, "✅ Nota guardada.");
-        userSessions.set(chatId, "authenticated");
-
-        const user = await prisma.ep_users.findUnique({
-          where: { users_id: userId },
-          include: { roles: { include: { role: true } } },
-        });
-
-        const isAdmin =
-          user?.roles.some((r) =>
-            ["admin", "administrador"].includes(r.role.rol_name.toLowerCase())
-          ) || false;
-
-        await showMainMenu(chatId, isAdmin);
+        // Pedir fecha de expiración
+        await sendMessage(
+          chatId,
+          "📅 Ingrese la fecha de expiración (YYYY-MM-DD)."
+        );
+        userSessions.set(chatId, "awaiting_expiry_date");
+        return NextResponse.json({ ok: true });
       }
 
+      return NextResponse.json({ ok: true });
+    }
+
+    // 🔐 Validar fecha de expiración
+    if (sessionState === "awaiting_expiry_date") {
+      const pending = pendingUserData.get(chatId);
+      if (!pending) {
+        await sendMessage(
+          chatId,
+          "⚠️ Error de sesión. Intente con /start nuevamente."
+        );
+        userSessions.delete(chatId);
+        return NextResponse.json({ ok: true });
+      }
+
+      // Validar formato de fecha
+      const fechaIngresada = texto!.trim();
+      const fechaExpiracion = new Date(`${fechaIngresada}T23:59:59`);
+
+      if (isNaN(fechaExpiracion.getTime())) {
+        await sendMessage(
+          chatId,
+          "❌ Formato de fecha inválido. Use 'YYYY-MM-DD'."
+        );
+        return NextResponse.json({ ok: true });
+      }
+
+      // Guardar la nota
+      await prisma.ep_notes.create({
+        data: {
+          notes_user_id: pending.id,
+          notes_content: pending.content,
+          notes_date: new Date(),
+          notes_expiry: fechaExpiracion,
+          notes_status: pending.status,
+        },
+      });
+
+      await sendMessage(chatId, "✅ Nota guardada correctamente.");
+      userSessions.set(chatId, "authenticated");
+      pendingUserData.delete(chatId);
+
+      // Mostrar menú principal
+      const isAdmin = await isUserAdmin(pending.id);
+      await showMainMenu(chatId, isAdmin);
       return NextResponse.json({ ok: true });
     }
 
     // 🔘 Por defecto
     return NextResponse.json({ ok: true });
   } catch (err: any) {
-    console.error("❌ Error:", err.response?.data || err.message);
+    console.error("❌ Error:", err.message);
     return NextResponse.json(
       { ok: false, error: err.message },
       { status: 500 }

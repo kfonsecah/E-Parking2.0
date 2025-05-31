@@ -4,6 +4,54 @@ import { getUserIdFromRequest } from "@/lib/getUserIdFromRequest"; // Usamos JWT
 
 const prisma = new PrismaClient();
 
+/**
+ * @swagger
+ * /api/cashier/open-session:
+ *   get:
+ *     summary: Get Current Open Cashier Session
+ *     description: Retrieves the currently open cashier session for the authenticated user, if it exists.
+ *     responses:
+ *       200:
+ *         description: Open cashier session retrieved successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 sessionId:
+ *                   type: string
+ *                   description: The unique identifier for the open cashier session.
+ *                   example: "123e4567-e89b-12d3-a456-426614174000"
+ *                 cashType:
+ *                   type: string
+ *                   description: The type of the open cashier session (e.g., "physical" or "virtual").
+ *                   example: "physical"
+ *                 openTime:
+ *                   type: string
+ *                   format: date-time
+ *                   description: The timestamp of when the session was opened.
+ *                   example: "2025-05-19T08:00:00Z"
+ *       401:
+ *         description: User not authenticated.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "No autorizado"
+ *       500:
+ *         description: Internal server error.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Error interno"
+ */
 export async function GET(req: NextRequest) {
   try {
     const userId = await getUserIdFromRequest(req);

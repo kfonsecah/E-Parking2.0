@@ -18,7 +18,18 @@ export async function handleInlineCallback(chatId: number, data: string) {
 
   if (data === "enviar_nota") {
     userSessions.set(chatId, "writing_note");
-    await sendMessage(chatId, "📝 Escriba su nota.");
+    await sendMessage(
+      chatId,
+      "📝 Escriba su nota en el siguiente formato:\n\n" +
+        "<estado> <contenido>\n\n" +
+        "📌 Estados permitidos:\n" +
+        " - nuevo (verde)\n" +
+        " - advertencia (amarillo)\n" +
+        " - alerta (rojo)\n\n" +
+        "Ejemplo:\n" +
+        "advertencia No permitir la entrada al carro AAA-123\n\n" +
+        "⚠️ Recuerde que el estado es obligatorio y debe ir primero.\n"
+    );
     return;
   }
 

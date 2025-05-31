@@ -5,6 +5,102 @@ import { authOptions } from "@/lib/authOptions"; // Ajusta si tu proyecto cambia
 
 const prisma = new PrismaClient();
 
+/**
+ * @swagger
+ * /api/cashier/history:
+ *   get:
+ *     summary: Get Cashier Session History
+ *     description: Retrieves the cashier session history for the authenticated user for the current day, filtered by cash type.
+ *     parameters:
+ *       - in: query
+ *         name: cashType
+ *         required: true
+ *         description: The type of cashier session to retrieve (e.g., "physical" or "virtual").
+ *         schema:
+ *           type: string
+ *           example: "physical"
+ *     responses:
+ *       200:
+ *         description: Cashier session history retrieved successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Sesiones encontradas"
+ *                 sessions:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       sessionId:
+ *                         type: string
+ *                         description: The unique identifier for the cashier session.
+ *                         example: "123e4567-e89b-12d3-a456-426614174000"
+ *                       openingAmount:
+ *                         type: number
+ *                         description: The opening amount of the cashier session.
+ *                         example: 10000.00
+ *                       closingAmount:
+ *                         type: number
+ *                         description: The closing amount of the cashier session (if closed).
+ *                         example: 15000.00
+ *                       isClosed:
+ *                         type: boolean
+ *                         description: Indicates if the cashier session is closed.
+ *                         example: true
+ *                       openTime:
+ *                         type: string
+ *                         format: date-time
+ *                         description: The time when the session was opened.
+ *                         example: "2025-05-19T08:00:00Z"
+ *                       closeTime:
+ *                         type: string
+ *                         format: date-time
+ *                         description: The time when the session was closed (if closed).
+ *                         example: "2025-05-19T17:00:00Z"
+ *       400:
+ *         description: Missing or invalid query parameter.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Tipo de caja (cashType) es requerido"
+ *                 detail:
+ *                   type: string
+ *                   example: "The 'cashType' query parameter is required."
+ *       401:
+ *         description: User not authenticated.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Usuario no autenticado"
+ *                 detail:
+ *                   type: string
+ *                   example: "User must be authenticated to view cashier session history."
+ *       500:
+ *         description: Internal server error.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Error al consultar historial de cajas"
+ *                 detail:
+ *                   type: string
+ *                   example: "An unexpected error occurred while retrieving the cashier session history."
+ */
 export async function GET(req: NextRequest) {
   try {
     // Validar usuario autenticado

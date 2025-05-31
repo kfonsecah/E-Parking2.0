@@ -5,6 +5,34 @@ import { format, toZonedTime } from "date-fns-tz";
 
 const prisma = new PrismaClient();
 
+/**
+ * @swagger
+ * /api/reminders/send:
+ *   post:
+ *     summary: Send Package Expiration Reminders
+ *     description: Sends email reminders to clients with packages that are about to expire within the next 7 days.
+ *     responses:
+ *       200:
+ *         description: Reminders sent successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Recordatorios enviados correctamente"
+ *       500:
+ *         description: Internal server error.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Error al enviar recordatorios"
+ */
 export async function POST() {
   try {
     // 📅 Configurar la zona horaria para Costa Rica

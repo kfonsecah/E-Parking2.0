@@ -3,7 +3,151 @@ import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
-
+/**
+ * @swagger
+ * /api/users/{id}:
+ *   patch:
+ *     summary: Update User
+ *     description: Updates user details, including the password if provided.
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: The ID of the user to update.
+ *         schema:
+ *           type: integer
+ *           example: 1
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               users_name:
+ *                 type: string
+ *                 description: The updated first name of the user.
+ *                 example: "John"
+ *               users_lastname:
+ *                 type: string
+ *                 description: The updated last name of the user.
+ *                 example: "Doe"
+ *               users_id_card:
+ *                 type: string
+ *                 description: The updated ID card of the user.
+ *                 example: "1234567890"
+ *               users_email:
+ *                 type: string
+ *                 description: The updated email address of the user.
+ *                 example: "john.doe@example.com"
+ *               users_username:
+ *                 type: string
+ *                 description: The updated username of the user.
+ *                 example: "johndoe"
+ *               users_password:
+ *                 type: string
+ *                 description: The updated password of the user.
+ *                 example: "newpassword123"
+ *               users_version:
+ *                 type: integer
+ *                 description: The updated version number of the user.
+ *                 example: 2
+ *     responses:
+ *       200:
+ *         description: User updated successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 users_id:
+ *                   type: integer
+ *                   description: The ID of the updated user.
+ *                   example: 1
+ *                 users_name:
+ *                   type: string
+ *                   description: The updated first name of the user.
+ *                   example: "John"
+ *                 users_lastname:
+ *                   type: string
+ *                   description: The updated last name of the user.
+ *                   example: "Doe"
+ *                 users_id_card:
+ *                   type: string
+ *                   description: The updated ID card of the user.
+ *                   example: "1234567890"
+ *                 users_email:
+ *                   type: string
+ *                   description: The updated email address of the user.
+ *                   example: "john.doe@example.com"
+ *                 users_username:
+ *                   type: string
+ *                   description: The updated username of the user.
+ *                   example: "johndoe"
+ *                 users_version:
+ *                   type: integer
+ *                   description: The updated version number of the user.
+ *                   example: 2
+ *       404:
+ *         description: User not found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Usuario no encontrado"
+ *       500:
+ *         description: Internal server error.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Error al actualizar el usuario"
+ *                 detail:
+ *                   type: string
+ *                   example: "An unexpected error occurred while updating the user."
+ *
+ *   delete:
+ *     summary: Delete User
+ *     description: Deletes a user and their associated roles.
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: The ID of the user to delete.
+ *         schema:
+ *           type: integer
+ *           example: 1
+ *     responses:
+ *       200:
+ *         description: User and roles deleted successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Usuario y roles eliminados correctamente."
+ *       500:
+ *         description: Internal server error.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Error al eliminar el usuario"
+ *                 detail:
+ *                   type: string
+ *                   example: "An unexpected error occurred while deleting the user."
+ */
 // ✅ PATCH con params como promesa
 export async function PATCH(
   req: NextRequest,

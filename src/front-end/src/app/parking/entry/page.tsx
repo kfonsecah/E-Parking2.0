@@ -1,22 +1,23 @@
-'use client'
-export const dynamic = 'force-dynamic'
+"use client";
+export const dynamic = 'force-dynamic';
 
-import { Search, Camera, Calendar, Paintbrush, Printer } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Card, CardContent } from "@/components/ui/card"
-import Modal from "@/components/ui/Modal"
-import { useVehicleManagement } from "@/app/hooks/useVehicleManagement"
+import { Search, Camera, Calendar, Paintbrush, Printer } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent } from "@/components/ui/card";
+import Modal from "@/components/ui/Modal";
+import { useVehicleManagement } from "@/app/hooks/useVehicleManagement";
+import { useVehiclePackages } from "@/app/hooks/useVehiclePackages";
 import { useTicketPrinter } from "@/app/hooks/useTicketPrinter";
 import { normalizeColor } from "@/lib/normalizeColor";
-import { normalizedColorMap } from "@/lib/nromalizedColorMap"
+import { normalizedColorMap } from "@/lib/nromalizedColorMap";
 import { useLoader } from "@/context/LoaderContext";
 import GlobalLoader from "@/components/GlobalLoader";
-import PlateLoader from "@/components/InlinePlateLoader";
-import InlinePlateLoader from "@/components/InlinePlateLoader"
-
+import InlinePlateLoader from "@/components/InlinePlateLoader";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function VehicleManagementPage() {
+  const queryClient = useQueryClient();
   const { isLoading } = useLoader();
   const {
     router,
@@ -39,21 +40,48 @@ export default function VehicleManagementPage() {
     recognizePlateFromImage,
     isDetectingPlate,
     setIsDetectingPlate,
-  } = useVehicleManagement()
+  } = useVehicleManagement();
 
   const { printIngressTicket } = useTicketPrinter();
+  const { verifyPackage, exitVehicle, clientInfo, resetClientInfo } = useVehiclePackages();
 
   if (isLoading) {
     return <GlobalLoader />;
   }
 
+  const handleVehicleExit = async (plate: string, id: string) => {
+    try {
+      // Verificar si tiene paquete activo
+      const hasPackage = await verifyPackage(plate);
+
+      if (hasPackage) {
+        const exitSuccess = await exitVehicle(plate);
+        if (exitSuccess) {
+          // Refrescar tabla
+          queryClient.invalidateQueries({ queryKey: ["vehicles"] });
+
+          showModal(`🚗 El vehículo ${plate} con paquete activo salió sin costo.`);
+          resetClientInfo();
+          return;
+        } else {
+          showModal(`⚠️ Error al procesar la salida del vehículo ${plate}.`);
+          return;
+        }
+      }
+
+      // Si no tiene paquete, sigue con el flujo normal
+      router.push(`/parking/cashier-exit?id=${id}`);
+    } catch (error) {
+      console.error("❌ Error al verificar paquete:", error);
+      showModal("Error al verificar paquete del vehículo.");
+    }
+  };
+
+
+
   return (
     <div className="container mx-auto p-4">
-      <Modal
-        isOpen={modalOpen}
-        message={modalMessage}
-        onClose={closeModal}
-      />
+      <Modal isOpen={modalOpen} message={modalMessage} onClose={closeModal} />
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
         {/* Left column - Recent Entries */}
@@ -111,7 +139,7 @@ export default function VehicleManagementPage() {
                         variant="destructive"
                         size="sm"
                         className="bg-red-800 hover:bg-red-900 text-xs flex items-center gap-1 px-3"
-                        onClick={() => router.push(`/parking/cashier-exit?id=${entry.id}`)}
+                        onClick={() => handleVehicleExit(entry.plate, entry.id)}
                       >
                         Salida
                       </Button>
@@ -125,8 +153,6 @@ export default function VehicleManagementPage() {
                             ? `${entry.date}T${entry.time}`
                             : `${newEntry.date}T${newEntry.time}`;
 
-                          console.log("🕓 Fecha y hora enviadas:", ingressDate);
-
                           printIngressTicket({
                             owner: entry.owner,
                             plate: entry.plate,
@@ -139,7 +165,6 @@ export default function VehicleManagementPage() {
                         Imprimir
                       </Button>
 
-
                       <Button
                         variant="outline"
                         size="sm"
@@ -147,9 +172,6 @@ export default function VehicleManagementPage() {
                         onClick={() => handleDelete(entry.id)}
                       >
                         <span>Eliminar</span>
-                        <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9 7h6m2 0H7" />
-                        </svg>
                       </Button>
                     </div>
                   </div>
@@ -323,6 +345,6 @@ export default function VehicleManagementPage() {
           </Card>
         </div>
       </div>
-    </div >
-  )
+    </div>
+  );
 }

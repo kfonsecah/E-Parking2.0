@@ -20,4 +20,5 @@ export type SessionState =
   | "create_cash_amount"
   | "create_cash_date"
   | "create_role_name"
-  | "awaiting_password";
+  | "awaiting_password"
+  | "awaiting_expiry_date";

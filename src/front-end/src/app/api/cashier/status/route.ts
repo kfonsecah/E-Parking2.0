@@ -5,6 +5,74 @@ import { authOptions } from "@/lib/authOptions";
 
 const prisma = new PrismaClient();
 
+/**
+ * @swagger
+ * /api/cashier/status:
+ *   get:
+ *     summary: Get Current Cashier Status
+ *     description: Retrieves the current status of the authenticated user's active cashier session, including the opening amount, total ingresos, total egresos, and current balance.
+ *     responses:
+ *       200:
+ *         description: Cashier status retrieved successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 hasActiveSession:
+ *                   type: boolean
+ *                   description: Indicates if the user has an active cashier session.
+ *                   example: true
+ *                 openingAmount:
+ *                   type: number
+ *                   description: The amount of cash registered when the session was opened.
+ *                   example: 10000.00
+ *                 totalIngresos:
+ *                   type: number
+ *                   description: The total amount of ingresos (cash in) during the session.
+ *                   example: 5000.00
+ *                 totalEgresos:
+ *                   type: number
+ *                   description: The total amount of egresos (cash out) during the session.
+ *                   example: 2000.00
+ *                 saldoActual:
+ *                   type: number
+ *                   description: The current balance of the active cashier session.
+ *                   example: 13000.00
+ *       401:
+ *         description: User not authenticated.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Usuario no autenticado"
+ *       400:
+ *         description: Invalid user ID.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "ID de usuario inválido"
+ *       500:
+ *         description: Internal server error.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Error al consultar estado de caja"
+ *                 detail:
+ *                   type: string
+ *                   example: "An unexpected error occurred while retrieving the cashier status."
+ */
 export async function GET(req: NextRequest) {
   try {
     // Validar usuario autenticado

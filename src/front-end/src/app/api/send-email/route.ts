@@ -4,7 +4,80 @@ import { sendMail } from "@/lib/mailer";
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
-
+/**
+ * @swagger
+ * /api/send-email:
+ *   post:
+ *     summary: Send Welcome Email
+ *     description: Sends a welcome email to a newly registered client with their package details.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               to:
+ *                 type: string
+ *                 description: The email address of the recipient.
+ *                 example: "cliente@example.com"
+ *               client_name:
+ *                 type: string
+ *                 description: The name of the client.
+ *                 example: "Juan Pérez"
+ *               package_name:
+ *                 type: string
+ *                 description: The name of the package the client subscribed to.
+ *                 example: "Premium Package"
+ *               package_price:
+ *                 type: number
+ *                 description: The price of the package.
+ *                 example: 99.99
+ *               start_date:
+ *                 type: string
+ *                 format: date
+ *                 description: The start date of the package.
+ *                 example: "2025-05-01"
+ *               end_date:
+ *                 type: string
+ *                 format: date
+ *                 description: The end date of the package.
+ *                 example: "2025-05-31"
+ *     responses:
+ *       200:
+ *         description: Email sent successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 ok:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: "Correo enviado correctamente"
+ *       400:
+ *         description: Missing required fields.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Faltan campos"
+ *       500:
+ *         description: Internal server error.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Error al enviar correo"
+ */
 export async function POST(req: NextRequest) {
   try {
     const {

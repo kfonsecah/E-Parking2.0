@@ -6,6 +6,56 @@ import { jwtVerify } from "jose";
 const prisma = new PrismaClient();
 const jwtSecret = new TextEncoder().encode(process.env.JWT_SECRET!);
 
+/**
+ * @swagger
+ * /users/logout:
+ *   post:
+ *     summary: User Logout
+ *     description: Logs out the user by clearing the session and removing the authentication cookie.
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: User successfully logged out.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 ok:
+ *                   type: boolean
+ *                   example: true
+ *       400:
+ *         description: Unknown user ID.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Unknown user ID"
+ *       401:
+ *         description: Unauthorized.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Unauthorized"
+ *       500:
+ *         description: Server error.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Error during logout"
+ */
 export async function POST(req: NextRequest) {
   try {
     let userId: number | null = null;

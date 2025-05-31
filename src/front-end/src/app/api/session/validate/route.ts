@@ -8,6 +8,49 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 const jwtSecret = new TextEncoder().encode(process.env.JWT_SECRET!);
 
+/**
+ * @swagger
+ * /api/auth/validate:
+ *   get:
+ *     summary: Validate User Session
+ *     description: Validates the user's session using either a custom JWT or NextAuth token.
+ *     responses:
+ *       200:
+ *         description: Session validated successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 ok:
+ *                   type: boolean
+ *                   description: Indicates if the session is valid.
+ *                   example: true
+ *                 origin:
+ *                   type: string
+ *                   description: The authentication method used to validate the session.
+ *                   example: "JWT personalizado"
+ *       401:
+ *         description: Invalid or unauthorized session.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Sesión inválida"
+ *       500:
+ *         description: Internal server error.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Error validando sesión"
+ */
 export async function GET(req: NextRequest) {
   try {
     let userId: number | null = null;

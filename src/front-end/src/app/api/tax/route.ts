@@ -3,6 +3,108 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
+/**
+ * @swagger
+ * /api/tax:
+ *   post:
+ *     summary: Create or Update Tax
+ *     description: Creates a new tax record or updates the existing tax record with a new price.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               tax_price:
+ *                 type: number
+ *                 description: The price of the tax.
+ *                 example: 1500.00
+ *     responses:
+ *       200:
+ *         description: Tax created or updated successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 tax_id:
+ *                   type: integer
+ *                   description: The ID of the tax record.
+ *                   example: 1
+ *                 tax_price:
+ *                   type: number
+ *                   description: The current price of the tax.
+ *                   example: 1500.00
+ *                 tax_version:
+ *                   type: integer
+ *                   description: The current version of the tax record.
+ *                   example: 2
+ *       400:
+ *         description: Invalid tax price.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Precio inválido"
+ *       500:
+ *         description: Internal server error.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Error interno del servidor"
+ *
+ *   get:
+ *     summary: Get Current Tax
+ *     description: Retrieves the current tax record.
+ *     responses:
+ *       200:
+ *         description: Tax retrieved successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 tax_id:
+ *                   type: integer
+ *                   description: The ID of the tax record.
+ *                   example: 1
+ *                 tax_price:
+ *                   type: number
+ *                   description: The current price of the tax.
+ *                   example: 1500.00
+ *                 tax_version:
+ *                   type: integer
+ *                   description: The current version of the tax record.
+ *                   example: 2
+ *       404:
+ *         description: Tax record not found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "No hay registro de impuesto"
+ *       500:
+ *         description: Internal server error.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Error al obtener el impuesto"
+ */
 export async function POST(req: Request) {
   try {
     const body = await req.json();

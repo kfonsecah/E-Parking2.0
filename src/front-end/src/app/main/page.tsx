@@ -1,26 +1,22 @@
 "use client";
-export const dynamic = 'force-dynamic'
+export const dynamic = 'force-dynamic';
 
 import Image from "next/image";
 import { Avatar } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
 import { useDashboardManagement } from "@/app/hooks/useDashboardManagement";
-import { useEffect, useState } from "react";
-import { TooltipProps } from "recharts";
 import { useLoader } from "@/context/LoaderContext";
 import GlobalLoader from "@/components/GlobalLoader";
 
 export default function Dashboard() {
-
-
     const { router, name, role, notas, loadingNotas } = useDashboardManagement();
     const { isLoading } = useLoader();
 
     if (isLoading) {
         return <GlobalLoader />;
     }
-    return (
 
+    return (
         <div className="flex flex-col w-full px-6 py-4 gap-4 bg-transparent min-h-screen">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {/* Columna izquierda */}
@@ -39,10 +35,11 @@ export default function Dashboard() {
                             <p className="text-white/80 text-sm">{role}</p>
                         </div>
                     </Card>
+                    {/* Columna derecha */}
 
                     {/* Tarjeta Realizar Ingreso */}
                     <Card className="overflow-hidden h-[130px] relative rounded-xl cursor-pointer transition-transform hover:scale-[1.01] hover:brightness-105 active:scale-95"
-                        onClick={() => router.push(`/parking/entry`)}>
+                        onClick={() => router.push("/parking/entry")}>
                         <div className="absolute inset-0 bg-[linear-gradient(to_top,#00344A_24%,#19868B_100%)]">
                             <div className="absolute inset-0 opacity-20">
                                 <div className="absolute right-0 w-40 h-40 rounded-full bg-teal-400 translate-x-1/3" />
@@ -74,7 +71,7 @@ export default function Dashboard() {
 
                     {/* Tarjeta Realizar Salida */}
                     <Card className="overflow-hidden h-[130px] relative rounded-xl cursor-pointer transition-transform hover:scale-[1.01] hover:brightness-105 active:scale-95"
-                        onClick={() => router.push(`/parking/cashier-exit`)}>
+                        onClick={() => router.push("/parking/cashier-exit")}>
 
                         <div className="absolute inset-0 bg-[linear-gradient(to_top,#00344A_24%,#19868B_100%)]">
                             <div className="absolute inset-0 opacity-20">
@@ -107,7 +104,7 @@ export default function Dashboard() {
 
                     {/* Tarjeta Reportes */}
                     <Card className="overflow-hidden h-[130px] relative rounded-xl cursor-pointer transition-transform hover:scale-[1.01] hover:brightness-105 active:scale-95"
-                        onClick={() => router.push(`/reports`)}>
+                        onClick={() => router.push("/reports")}>
                         <div className="absolute inset-0 bg-[linear-gradient(to_top,#00344A_24%,#19868B_100%)]">
                             <div className="absolute inset-0 opacity-20">
                                 <div className="absolute right-0 w-40 h-40 rounded-full bg-teal-400 translate-x-1/3" />
@@ -136,6 +133,7 @@ export default function Dashboard() {
                             />
                         </div>
                     </Card>
+
                 </div>
 
                 {/* Columna derecha */}
@@ -144,7 +142,6 @@ export default function Dashboard() {
                         <h2 className="text-lg font-semibold text-gray-800 mb-4">Notas Importantes</h2>
                         <div className="bg-gray-100 p-3 rounded-lg max-h-[510px] overflow-y-auto space-y-3">
                             {loadingNotas ? (
-
                                 <p className="text-sm text-gray-500">Cargando notas...</p>
                             ) : notas.length === 0 ? (
                                 <p className="text-sm text-gray-500">No hay notas disponibles.</p>
@@ -155,18 +152,18 @@ export default function Dashboard() {
                                         texto={nota.contenido}
                                         autor={nota.usuario}
                                         fecha={nota.fecha}
+                                        expiracion={nota.expiracion}
+                                        estado={nota.estado}
+                                        color={nota.color}
                                     />
                                 ))
                             )}
                         </div>
                     </Card>
 
-
                 </div>
-
             </div>
-        </div>
-
+        </div >
     );
 }
 
@@ -174,33 +171,47 @@ function NotaItem({
     texto,
     autor,
     fecha,
+    expiracion,
+    estado,
+    color,
 }: {
     texto: string;
     autor: string;
     fecha: string;
+    expiracion?: string;
+    estado: string;
+    color: string;
 }) {
-    const esReciente = (() => {
-        const creada = new Date(fecha).getTime();
 
-        // Ajustar hora actual a UTC-6 (Costa Rica)
-        const ahoraUTC = new Date();
-        const ahoraCR = new Date(ahoraUTC.getTime() - 6 * 60 * 60 * 1000);
-
-        const diffMin = (ahoraCR.getTime() - creada) / 1000 / 60;
-        return diffMin <= 15;
-    })();
-
+    const borderColor =
+        color === "green"
+            ? "border-l-green-400"
+            : color === "yellow"
+                ? "border-l-yellow-400"
+                : color === "red"
+                    ? "border-l-red-400"
+                    : "border-l-gray-400";
 
     return (
-        <div className="bg-white border border-gray-100 rounded-md p-4 shadow-sm border-l-4 border-l-green-300">
+        <div className={`bg-white border rounded-md p-4 shadow-sm ${borderColor}`}>
             <div className="flex items-center gap-2 mb-2">
-                {esReciente && (
-                    <span className="bg-green-200 text-green-800 text-[10px] font-bold uppercase px-2 py-0.5 rounded-full">
-                        Nuevo
-                    </span>
-                )}
+                <span
+                    className={`text-xs font-semibold uppercase px-2 py-0.5 rounded-full ${color === "green"
+                        ? "bg-green-100 text-green-700"
+                        : color === "yellow"
+                            ? "bg-yellow-100 text-yellow-700"
+                            : color === "red"
+                                ? "bg-red-100 text-red-700"
+                                : "bg-gray-100 text-gray-700"
+                        }`}
+                >
+                    {estado}
+                </span>
             </div>
             <p className="text-sm text-gray-800 mb-2">{texto}</p>
+            {expiracion && (
+                <p className="text-xs text-gray-500 mb-2">Expira: {new Date(expiracion).toLocaleDateString()}</p>
+            )}
             <div className="flex items-center gap-2">
                 <Avatar className="h-6 w-6">
                     <div className="bg-gray-800 h-full w-full flex items-center justify-center text-white text-xs font-bold">
@@ -209,8 +220,6 @@ function NotaItem({
                 </Avatar>
                 <span className="text-xs text-gray-500 font-medium">{autor}</span>
             </div>
-
         </div>
-
     );
 }

@@ -5,6 +5,115 @@ import { authOptions } from "@/lib/authOptions";
 
 const prisma = new PrismaClient();
 
+/**
+ * @swagger
+ * /api/cashier/open:
+ *   post:
+ *     summary: Open Cashier Session
+ *     description: Opens a new cashier session for the authenticated user, allowing them to register an initial cash amount and specify the type of cash session.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               cashType:
+ *                 type: string
+ *                 description: The type of cashier session (e.g., "physical" or "virtual").
+ *                 example: "physical"
+ *               openAmount:
+ *                 type: number
+ *                 description: The initial amount of cash registered for the session.
+ *                 example: 10000.00
+ *     responses:
+ *       201:
+ *         description: Cashier session successfully opened.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Caja abierta exitosamente"
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     session_id:
+ *                       type: string
+ *                       description: The unique identifier for the cashier session.
+ *                       example: "123e4567-e89b-12d3-a456-426614174000"
+ *                     session_user_id:
+ *                       type: number
+ *                       description: The ID of the user who opened the session.
+ *                       example: 123
+ *                     session_open_amount:
+ *                       type: number
+ *                       description: The amount registered at the session opening.
+ *                       example: 10000.00
+ *                     session_open_time:
+ *                       type: string
+ *                       format: date-time
+ *                       description: The timestamp of when the session was opened.
+ *                       example: "2025-05-19T08:00:00Z"
+ *                     session_cash_type:
+ *                       type: string
+ *                       description: The type of cash session (e.g., "physical" or "virtual").
+ *                       example: "physical"
+ *                     session_is_closed:
+ *                       type: boolean
+ *                       description: Indicates if the session is currently closed.
+ *                       example: false
+ *                     session_version:
+ *                       type: number
+ *                       description: The version of the session record.
+ *                       example: 1
+ *                 timestamp:
+ *                   type: string
+ *                   format: date-time
+ *                   description: Timestamp of the session creation in UTC format.
+ *                   example: "2025-05-19T08:00:00Z"
+ *       400:
+ *         description: Validation error or session already open for today.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Ya existe una caja abierta para este usuario hoy"
+ *                 detail:
+ *                   type: string
+ *                   example: "The user already has an open cashier session today."
+ *       401:
+ *         description: User not authenticated.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Usuario no autenticado"
+ *                 detail:
+ *                   type: string
+ *                   example: "User must be authenticated to open a cashier session."
+ *       500:
+ *         description: Internal server error.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Error al abrir caja"
+ *                 detail:
+ *                   type: string
+ *                   example: "An unexpected error occurred while opening the cashier session."
+ */
 export async function POST(req: NextRequest) {
   try {
     // Obtener sesión del usuario autenticado
